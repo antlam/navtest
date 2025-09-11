@@ -6,14 +6,17 @@
   <title>Billing Nav</title>
   <style>
     :root{
-      --surface:#fff;
+      --teal:#00B7B7;
       --bg:#f3f4f6;
+      --surface:#fff;
       --border:#e5e7eb;
       --ink:#374151;
       --ink-2:#6b7280;
       --hover:#f9fafb;
       --radius:6px;
     }
+
+    /* page */
     body{
       margin:0;
       background:var(--bg);
@@ -23,18 +26,85 @@
       justify-content:center;
       padding:40px 16px;
     }
+
+    /* app frame */
     .frame{
       width:100%;
-      max-width:600px;
-    }
-    .page-title{
-      margin:0 0 20px;
-      font-size:28px;
-      font-weight:700;
-      color:var(--ink);
+      max-width:600px;       /* <= requested width */
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:8px;
+      overflow:hidden;
+      box-shadow:0 2px 8px rgba(0,0,0,.06);
     }
 
-    /* section */
+    /* top bar (non-functional) */
+    .topbar{
+      height:56px;
+      background:var(--teal);
+      color:#fff;
+      display:grid;
+      grid-template-columns: 1fr minmax(120px, 160px) 1fr;
+      align-items:center;
+      padding:0 12px;
+    }
+    .tb-left,
+    .tb-center,
+    .tb-right{ display:flex; align-items:center; }
+    .tb-left{ justify-content:flex-start; gap:12px; }
+    .tb-center{ justify-content:center; }
+    .tb-right{ justify-content:flex-end; gap:18px; }
+
+    /* hamburger */
+    .hamburger{ width:26px; height:18px; position:relative; }
+    .hamburger i{
+      position:absolute; left:0; right:0; height:2px; background:#fff; border-radius:2px;
+    }
+    .hamburger i:nth-child(1){ top:0; }
+    .hamburger i:nth-child(2){ top:8px; }
+    .hamburger i:nth-child(3){ bottom:0; }
+
+    /* logo pill (center) */
+    .logo{
+      width:64px; height:30px;
+      border-radius:6px;
+      background:#E6FFFF;
+      color:#008A8A;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:800; letter-spacing:.2px;
+    }
+
+    /* chat + help icons */
+    .bubble, .question{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:22px; height:22px; font-weight:700; font-size:16px; line-height:1;
+    }
+    .bubble{
+      position:relative;
+      width:22px; height:18px; border:2px solid #fff; border-radius:4px;
+    }
+    .bubble:after{
+      content:""; position:absolute; bottom:-5px; left:4px;
+      width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent;
+      border-top:6px solid #fff;
+      transform:rotate(45deg);
+    }
+
+    /* avatar (outlined) */
+    .avatar{
+      width:32px; height:32px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      border:2px solid #fff; color:#fff; font-weight:700;
+    }
+
+    /* content area */
+    .content{ padding:16px; background:#f7f8fb; }
+    .page-title{
+      margin:8px 0 16px 4px;
+      font-size:32px; font-weight:700; color:#5b616c;
+    }
+
+    /* sections */
     .section{
       background:var(--surface);
       border:1px solid var(--border);
@@ -43,74 +113,73 @@
       margin-bottom:10px;
     }
     .section__header{
-      width:100%;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:14px 16px;
-      font-weight:600;
-      color:var(--ink);
-      background:var(--surface);
-      cursor:pointer;
-      text-align:left;
+      width:100%; display:flex; align-items:center; justify-content:space-between;
+      padding:16px; background:var(--surface);
+      font-weight:700; font-size:20px; color:var(--ink);
+      text-align:left; cursor:pointer;
     }
     .section__header:hover{ background:var(--hover); }
-    .chev{
-      width:18px; height:18px;
-      color:var(--ink-2);
-      transition:transform .15s ease;
-    }
+    .chev{ width:18px; height:18px; color:#414B57; transition:transform .15s ease; }
     .chev--open{ transform:rotate(90deg); }
 
     .section__items{ display:none; border-top:1px solid var(--border); }
     .item{
-      width:100%;
-      display:block;
-      padding:12px 16px;
-      text-align:left;
-      background:var(--surface);
-      border:0;
-      cursor:pointer;
-      color:var(--ink-2);
-      font-size:14px;
+      width:100%; display:block; text-align:left;
+      padding:12px 16px; background:var(--surface);
+      border:0; cursor:pointer; color:var(--ink-2); font-size:14px;
     }
     .item:hover{ background:var(--hover); color:var(--ink); }
 
-    /* indentation */
-    .indent-1{ padding-left:20px; }
-    .indent-2{ padding-left:36px; }
-    .indent-3{ padding-left:52px; }
+    /* indentation for sub-items */
+    .indent-1{ padding-left:22px; }
+    .indent-2{ padding-left:38px; }
+    .indent-3{ padding-left:54px; }
   </style>
 </head>
 <body>
-  <div class="frame" id="app">
-    <h1 class="page-title">Billing</h1>
+  <div class="frame">
+    <!-- TOP BAR -->
+    <div class="topbar" aria-hidden="true">
+      <div class="tb-left">
+        <div class="hamburger" title="Menu">
+          <i></i><i></i><i></i>
+        </div>
+      </div>
+      <div class="tb-center">
+        <div class="logo" title="Jane">Jane</div>
+      </div>
+      <div class="tb-right">
+        <span class="bubble" title="Messages"></span>
+        <span class="question" title="Help">?</span>
+        <div class="avatar" title="Demo Owner">DO</div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content" id="app">
+      <h1 class="page-title">Billing</h1>
+      <!-- Sections injected below -->
+    </div>
   </div>
 
   <script>
-    const h=(tag,props={},children=[])=>{
-      const el=document.createElement(tag);
-      for(const[k,v]of Object.entries(props)){
-        if(k==='class')el.className=v;
-        else if(k==='onClick')el.addEventListener('click',v);
-        else el.setAttribute(k,v);
-      }
-      [].concat(children).forEach(c=>el.append(c?.nodeType?c:document.createTextNode(c)));
-      return el;
-    };
+    /* tiny helper */
+    const h=(t,p={},c=[])=>{const e=document.createElement(t);for(const[k,v]of Object.entries(p)){if(k==='class')e.className=v;else if(k==='style'&&typeof v==='object')Object.assign(e.style,v);else if(k.startsWith('on')&&typeof v==='function')e.addEventListener(k.slice(2),v);else e.setAttribute(k,v)};for(const n of[].concat(c))e.append(n?.nodeType?n:document.createTextNode(n??''));return e};
+
     const Chevron=()=>h('span',{class:'chev'},['›']);
 
     function createSection({title,items=[],defaultExpanded=false}){
       const root=h('div',{class:'section'});
       const chev=Chevron(); if(defaultExpanded) chev.classList.add('chev--open');
-      const header=h('button',{class:'section__header',type:'button'},[title,chev]);
-      const list=h('div',{class:'section__items',style:`display:${defaultExpanded?'block':'none'}`});
+      const header=h('button',{class:'section__header',type:'button','aria-expanded':String(defaultExpanded)},[title,chev]);
+      const list=h('div',{class:'section__items',style:{display:defaultExpanded?'block':'none'}});
       items.forEach(it=>{
-        const indentClass=`indent-${it.indent??1}`;
-        list.append(h('button',{class:`item ${indentClass}`,type:'button'},[it.title]));
+        const indent=`indent-${Math.min(Math.max(it.indent??1,1),3)}`;
+        list.append(h('button',{class:`item ${indent}`,type:'button'},[it.title]));
       });
       header.addEventListener('click',()=>{
-        const open=list.style.display==='block';
+        const open=header.getAttribute('aria-expanded')==='true';
+        header.setAttribute('aria-expanded',String(!open));
         list.style.display=open?'none':'block';
         chev.classList.toggle('chev--open',!open);
       });
@@ -118,47 +187,76 @@
       return root;
     }
 
+    /* sections + items preserved */
     const SECTIONS=[
       {
         title:'Claims & Insurance',
         defaultExpanded:true,
         items:[
-          {title:'Drafts'},
-          {title:'Unsubmitted (28)'},
-          {title:'Submitted (416)'},
-          {title:'Approved'},
-          {title:'Rejected (203)'},
-          {title:'Teleplan Submissions', indent:2},
-          {title:'Teleplan Remittances', indent:2},
+          { title:'Drafts' },
+          { title:'Unsubmitted (28)' },
+          { title:'Submitted (416)' },
+          { title:'Approved' },
+          { title:'On Hold' },
+          { title:'Rejected (203)' },
+          { title:'Partially Paid' },
+          { title:'Teleplan Submissions', indent:2 },
+          { title:'Teleplan Remittances', indent:2 },
+          { title:'Canada Life (TELUS eClaims)', indent:2 },
+          { title:'HCAI', indent:2 },
+          { title:'Manulife', indent:2 },
+          { title:'MSP (British Columbia)', indent:2 },
+          { title:'Pacific Blue Cross (Paper)', indent:2 },
+          { title:'Pacific Blue Cross PROVIDERnet', indent:2 },
+          { title:'WCB', indent:2 },
+          { title:'WSBC', indent:2 },
         ]
       },
       {
         title:'Payments & Reconciliation',
         items:[
-          {title:'Payments, Refunds, and Fees'},
-          {title:'Cash Reconciliation'},
-          {title:'Jane Payments Payouts'}
+          { title:'Payments, Refunds, and Fees' },
+          { title:'Applied & Unapplied Payments' },
+          { title:'Cash Reconciliation' },
+          { title:'Jane Payments Transactions' },
+          { title:'Jane Payments Monthly Processing' },
+          { title:'Jane Payments Payouts' },
+          { title:'Tips' },
+          { title:'Adjustments' },
+          { title:'Write Offs' },
         ]
       },
       {
         title:'Sales & Products',
         items:[
-          {title:'New Sale'},
-          {title:'Purchases'},
-          {title:'Gift Cards / Certificates'},
-          {title:'Credit Cards'},
+          { title:'New Sale' },
+          { title:'Purchases' },
+          { title:'Gift Cards / Certificates' },
+          { title:'Credit Cards' },
         ]
       },
       {
         title:'Reports',
         items:[
-          {title:'Summary'},
-          {title:'Sales'},
-          {title:'Accounts Receivable'},
-          {title:'Compensation'}
+          { title:'Summary' },
+          { title:'Sales' },
+          { title:'Sales by Staff Member' },
+          { title:'Accounts Receivable' },
+          { title:'Credit' },
+          { title:'Credit Memos' },
+          { title:'Gift Cards' },
+          { title:'Gift Card Transactions' },
+          { title:'Package & Membership Sales' },
+          { title:'Package & Membership Usage' },
+          { title:'Compensation' },
+          { title:'Transactions' },
+          { title:'Daily Transactions' },
+          { title:'Product Performance' },
+          { title:'Inventory' },
         ]
       }
     ];
+
     const app=document.getElementById('app');
     SECTIONS.forEach(cfg=>app.append(createSection(cfg)));
   </script>
