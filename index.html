@@ -3,285 +3,183 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Billing Navigation Demo</title>
+  <title>Jane Billing Nav</title>
   <style>
-  :root{
-    /* Jane-like palette */
-    --teal: #00B7B7;          /* primary brand teal */
-    --teal-600:#00A4A4;       /* hover/active */
-    --teal-700:#009494;       /* pressed */
-    --bg:#F5F7FA;             /* app background */
-    --card:#FFFFFF;           /* surfaces/cards */
-    --border:#E3E7EE;         /* dividers */
-    --text:#2F3941;           /* primary text */
-    --text-muted:#6B7785;     /* secondary text */
-    --muted:#F1F5F9;          /* subtle hover bg */
-    --ring:#4EA8FF;           /* focus ring */
-    --radius:12px;
-    --pad:16px;
-    --shadow:0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
-  }
+    :root{
+      --teal:#00B7B7;
+      --teal-600:#00A4A4;
+      --teal-700:#009494;
+      --bg:#E9EDF2;            /* app background behind the frame */
+      --card:#FFFFFF;
+      --border:#E3E7EE;
+      --text:#2F3941;
+      --text-muted:#6B7785;
+      --muted:#F5F7FA;
+      --ring:#4EA8FF;
+      --radius:12px;
+      --shadow:0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
+    }
+    body{
+      margin:0;
+      background:var(--bg);
+      font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+      color:var(--text);
+      display:flex;
+      justify-content:center;
+      padding:32px;
+    }
+    /* frame around app */
+    .frame{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:8px;
+      width:100%;
+      max-width:1024px;
+      min-height:600px;
+      display:flex;
+      flex-direction:column;
+      box-shadow:0 2px 8px rgba(0,0,0,.08);
+      overflow:hidden;
+    }
 
-  /* page */
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    display:flex; justify-content:center;
-  }
-  .wrap{ width:100%; max-width:720px; padding:28px 24px; }
+    /* top nav */
+    .topnav{
+      background:var(--teal);
+      color:#fff;
+      height:56px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 16px;
+    }
+    .topnav-left{ display:flex; align-items:center; gap:16px; }
+    .logo{ font-weight:700; font-size:18px; }
+    .topnav-right{ display:flex; align-items:center; gap:20px; }
+    .icon{ width:20px; height:20px; }
+    .avatar{
+      background:#fff; color:var(--teal);
+      border-radius:50%; width:32px; height:32px;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:600;
+    }
 
-  /* header / page title */
-  .page-title{
-    margin:0 0 16px 2px;
-    font-size:34px;
-    font-weight:700;
-    letter-spacing:.2px;
-    color:#6B6F7B;           /* Jane’s heading tint */
-  }
+    /* main content */
+    .content{
+      flex:1;
+      padding:24px;
+      background:#F9FBFC;
+    }
+    .page-title{ margin:0 0 16px; font-size:28px; font-weight:600; color:var(--text-muted); }
 
-  /* primary CTA (matches “New Sale” look) */
-  .cta{
-    display:inline-block;
-    width:100%;
-    border:0;
-    background:var(--teal);
-    color:#fff;
-    font-weight:700;
-    font-size:18px;
-    padding:14px 16px;
-    border-radius:10px;
-    box-shadow:var(--shadow);
-    cursor:pointer;
-    transition:background .15s ease, transform .02s ease;
-  }
-  .cta:hover{ background:var(--teal-600); }
-  .cta:active{ background:var(--teal-700); transform:translateY(1px); }
-  .cta:focus{ outline:2px solid var(--ring); outline-offset:2px; }
+    .cta{
+      display:inline-block;
+      width:100%;
+      border:0;
+      background:var(--teal);
+      color:#fff;
+      font-weight:700;
+      font-size:16px;
+      padding:12px 16px;
+      border-radius:6px;
+      box-shadow:var(--shadow);
+      cursor:pointer;
+      transition:background .15s ease;
+    }
+    .cta:hover{ background:var(--teal-600); }
+    .cta:active{ background:var(--teal-700); }
 
-  /* section (ExpandableNavigationSection) */
-  .section{
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    overflow:hidden;
-    box-shadow:var(--shadow);
-  }
-  .section + .section{ margin-top:16px; }
-
-  .section__header{
-    width:100%;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:var(--pad);
-    background:var(--card);
-    border-bottom:1px solid var(--border);
-    color:var(--text);
-    text-align:left;
-    gap:10px;
-    cursor:pointer;
-    transition:background .15s ease;
-  }
-  .section__header:hover{ background:#F9FBFC; }
-  .section__title{ font-weight:600; font-size:15px; }
-
-  .chev{ width:20px; height:20px; flex:0 0 20px; color:#8593A0; transition:transform .15s ease; }
-  .chev--open{ transform:rotate(90deg); }
-
-  .section__items{ display:block; }
-
-  /* sub item (SubNavigationItem) */
-  .item{
-    width:100%;
-    display:block;
-    text-align:left;
-    padding:12px 14px;
-    color:var(--text);
-    background:transparent;
-    border:0;
-    cursor:pointer;
-    transition:background .12s ease, color .12s ease;
-  }
-  .item:hover{ background:var(--muted); }
-  .item:focus{ outline:2px solid var(--ring); outline-offset:-2px; }
-
-  /* optional badge look if you include counts in labels, e.g., "Rejected (203)" */
-  .item .badge{
-    background:#E8F7F7;
-    color:#0B6B6B;
-    font-weight:600;
-    padding:2px 8px;
-    border-radius:999px;
-    margin-left:8px;
-    font-size:12px;
-  }
-</style>
+    /* section (expandable) */
+    .section{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+    .section + .section{ margin-top:16px; }
+    .section__header{
+      width:100%; display:flex; justify-content:space-between; align-items:center;
+      padding:16px;
+      background:var(--card);
+      border-bottom:1px solid var(--border);
+      font-weight:600;
+      cursor:pointer;
+    }
+    .section__header:hover{ background:var(--muted); }
+    .chev{ width:18px; height:18px; color:var(--text-muted); transition:transform .15s ease; }
+    .chev--open{ transform:rotate(90deg); }
+    .item{
+      display:block; width:100%;
+      text-align:left; padding:10px 14px;
+      background:transparent; border:0; cursor:pointer;
+      color:var(--text);
+    }
+    .item:hover{ background:var(--muted); }
+  </style>
 </head>
 <body>
-  <main class="wrap" id="app">
-    <h1 style="margin:0 0 12px 2px; font-size:18px; font-weight:700;">Billing</h1>
-    <!-- Sections will be injected here -->
-  </main>
+  <div class="frame">
+    <!-- Top nav -->
+    <div class="topnav">
+      <div class="topnav-left">
+        <div class="logo">Jane</div>
+      </div>
+      <div class="topnav-right">
+        <span class="icon">💬</span>
+        <span class="icon">❓</span>
+        <div class="avatar">DO</div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="content" id="app">
+      <h1 class="page-title">Billing</h1>
+      <button class="cta">New Sale</button>
+      <div style="height:16px"></div>
+    </div>
+  </div>
 
   <script>
-    /***************
-     * Utilities
-     ***************/
-    const h = (tag, attrs = {}, children = []) => {
-      const el = document.createElement(tag);
-      for (const [k, v] of Object.entries(attrs)) {
-        if (k === 'class') el.className = v;
-        else if (k === 'style') Object.assign(el.style, v);
-        else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2), v);
-        else if (v !== undefined && v !== null) el.setAttribute(k, v);
+    // utility
+    const h = (tag, attrs = {}, children=[])=>{
+      const el=document.createElement(tag);
+      for(const [k,v] of Object.entries(attrs)){
+        if(k==='class') el.className=v;
+        else if(k==='onClick') el.addEventListener('click',v);
+        else el.setAttribute(k,v);
       }
-      for (const c of [].concat(children)) el.append(c.nodeType ? c : document.createTextNode(c));
+      [].concat(children).forEach(c=>el.append(c.nodeType?c:document.createTextNode(c)));
       return el;
     };
+    const Chevron = ()=>h('span',{class:'chev'},['▶']);
 
-    const ChevronRightSVG = () => {
-      const svg = h('svg', { viewBox:'0 0 24 24', fill:'none', stroke:'currentColor', 'stroke-width':'2', 'stroke-linecap':'round', 'stroke-linejoin':'round', class:'chev' });
-      svg.append(h('polyline', { points:'9 18 15 12 9 6' }));
-      return svg;
-    };
-
-    /**************************************
-     * ExpandableNavigationSection (vanilla)
-     **************************************/
-    function createSection({ title, items = [], defaultExpanded = false }) {
-      const root = h('div', { class:'section' });
-
-      const chevron = ChevronRightSVG();
-      if (defaultExpanded) chevron.classList.add('chev--open');
-
-      const header = h('button', {
-        class:'section__header',
-        type:'button',
-        'aria-expanded': String(defaultExpanded),
-      }, [
-        h('span', { class:'section__title' }, [title]),
-        chevron
-      ]);
-
-      const list = h('div', { class:'section__items', style:{ display: defaultExpanded ? 'block' : 'none' }});
-
-      // Render items
-      items.forEach((item, i) => {
-        const indent = Math.max(0, Math.min((item.indent ?? 1), 8));
-        const padLeft = 12 + indent * 12; // px
-        const btn = h('button', {
-          class:'item',
-          type:'button',
-          style:{ paddingLeft: padLeft + 'px' },
-          'data-index': String(i),
-        }, [item.title]);
-        // Optional: hook a click handler (navigate, filter, etc.)
-        btn.addEventListener('click', () => {
-          // placeholder – replace with navigation or callback
-          console.log(`[NAV] ${title} → ${item.title}`);
-        });
+    function createSection({title,items=[],defaultExpanded=false}){
+      const root=h('div',{class:'section'});
+      const chev=Chevron(); if(defaultExpanded) chev.classList.add('chev--open');
+      const header=h('button',{class:'section__header'},[title,chev]);
+      const list=h('div',{style:`display:${defaultExpanded?'block':'none'}`});
+      items.forEach(it=>{
+        const btn=h('button',{class:'item'},[it.title]);
         list.append(btn);
       });
-
-      // Toggle logic
-      header.addEventListener('click', () => {
-        const open = header.getAttribute('aria-expanded') === 'true';
-        header.setAttribute('aria-expanded', String(!open));
-        list.style.display = open ? 'none' : 'block';
-        chevron.classList.toggle('chev--open', !open);
+      header.addEventListener('click',()=>{
+        const open=list.style.display==='block';
+        list.style.display=open?'none':'block';
+        chev.classList.toggle('chev--open',!open);
       });
-
-      // Keyboard affordance (Left/Right to collapse/expand)
-      header.addEventListener('keydown', (e) => {
-        const open = header.getAttribute('aria-expanded') === 'true';
-        if (e.key === 'ArrowRight' && !open) { header.click(); }
-        if (e.key === 'ArrowLeft'  && open)  { header.click(); }
-      });
-
-      root.append(header, list);
+      root.append(header,list);
       return root;
     }
 
-    /***********************
-     * Configure your content
-     * (edit this like props)
-     ***********************/
-    const SECTIONS = [
-      {
-        title: 'Claims & Insurance',
-        defaultExpanded: true,
-        items: [
-          { title: 'Drafts', indent: 1 },
-          { title: 'Unsubmitted (28)', indent: 1 },
-          { title: 'Submitted (416)', indent: 1 },
-          { title: 'Approved', indent: 1 },
-          { title: 'On Hold', indent: 1 },
-          { title: 'Rejected (203)', indent: 1 },
-          { title: 'Partially Paid', indent: 1 },
-          { title: 'Teleplan Submissions', indent: 2 },
-          { title: 'Teleplan Remittances', indent: 2 },
-          { title: 'Canada Life (TELUS eClaims)', indent: 2 },
-          { title: 'HCAI', indent: 2 },
-          { title: 'Manulife', indent: 2 },
-          { title: 'MSP (British Columbia)', indent: 2 },
-          { title: 'Pacific Blue Cross (Paper)', indent: 2 },
-          { title: 'Pacific Blue Cross PROVIDERnet', indent: 2 },
-          { title: 'WCB', indent: 2 },
-          { title: 'WSBC', indent: 2 },
-        ]
-      },
-      {
-        title: 'Payments & Reconciliation',
-        items: [
-          { title: 'Payments, Refunds, and Fees', indent: 1 },
-          { title: 'Applied & Unapplied Payments', indent: 1 },
-          { title: 'Cash Reconciliation', indent: 1 },
-          { title: 'Jane Payments Transactions', indent: 1 },
-          { title: 'Jane Payments Monthly Processing', indent: 1 },
-          { title: 'Jane Payments Payouts', indent: 1 },
-          { title: 'Tips', indent: 1 },
-          { title: 'Adjustments', indent: 1 },
-          { title: 'Write Offs', indent: 1 },
-        ]
-      },
-      {
-        title: 'Sales & Products',
-        items: [
-          { title: 'New Sale', indent: 1 },
-          { title: 'Purchases', indent: 1 },
-          { title: 'Gift Cards / Certificates', indent: 1 },
-          { title: 'Credit Cards', indent: 1 },
-        ]
-      },
-      {
-        title: 'Reports',
-        items: [
-          { title: 'Summary', indent: 1 },
-          { title: 'Sales', indent: 1 },
-          { title: 'Sales by Staff Member', indent: 1 },
-          { title: 'Accounts Receivable', indent: 1 },
-          { title: 'Credit', indent: 1 },
-          { title: 'Credit Memos', indent: 1 },
-          { title: 'Gift Cards', indent: 1 },
-          { title: 'Gift Card Transactions', indent: 1 },
-          { title: 'Package & Membership Sales', indent: 1 },
-          { title: 'Package & Membership Usage', indent: 1 },
-          { title: 'Compensation', indent: 1 },
-          { title: 'Transactions', indent: 1 },
-          { title: 'Daily Transactions', indent: 1 },
-          { title: 'Product Performance', indent: 1 },
-          { title: 'Inventory', indent: 1 },
-        ]
-      }
+    const SECTIONS=[
+      {title:'Reports',items:[
+        {title:'Summary'},
+        {title:'Sales'},
+        {title:'Accounts Receivable'}
+      ]}
     ];
-
-    /******************
-     * Render to page
-     ******************/
-    const mount = document.getElementById('app');
-    SECTIONS.forEach(cfg => mount.append(createSection(cfg)));
+    const app=document.getElementById('app');
+    SECTIONS.forEach(cfg=>app.append(createSection(cfg)));
   </script>
 </body>
 </html>
