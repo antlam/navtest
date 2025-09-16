@@ -173,103 +173,127 @@
   </div>
 
   <script>
-    /* tiny helper */
-    const h=(t,p={},c=[])=>{const e=document.createElement(t);for(const[k,v]of Object.entries(p)){if(k==='class')e.className=v;else if(k==='style'&&typeof v==='object')Object.assign(e.style,v);else if(k.startsWith('on')&&typeof v==='function')e.addEventListener(k.slice(2),v);else e.setAttribute(k,v)};for(const n of[].concat(c))e.append(n?.nodeType?n:document.createTextNode(n??''));return e};
-
-    const Chevron=()=>h('span',{class:'chev'},['›']);
-
-    function createSection({title,items=[],defaultExpanded=false}){
-      const root=h('div',{class:'section'});
-      const chev=Chevron(); if(defaultExpanded) chev.classList.add('chev--open');
-      const header=h('button',{class:'section__header',type:'button','aria-expanded':String(defaultExpanded)},[title,chev]);
-      const list=h('div',{class:'section__items',style:{display:defaultExpanded?'block':'none'}});
-      items.forEach(it=>{
-        const indent=`indent-${Math.min(Math.max(it.indent??1,1),3)}`;
-        list.append(h('button',{class:`item ${indent}`,type:'button'},[it.title]));
-      });
-      header.addEventListener('click',()=>{
-        const open=header.getAttribute('aria-expanded')==='true';
-        header.setAttribute('aria-expanded',String(!open));
-        list.style.display=open?'none':'block';
-        chev.classList.toggle('chev--open',!open);
-      });
-      root.append(header,list);
-      return root;
+  /* tiny helper */
+  const h = (t, p = {}, c = []) => {
+    const e = document.createElement(t);
+    for (const [k, v] of Object.entries(p)) {
+      if (k === 'class') e.className = v;
+      else if (k === 'style' && typeof v === 'object') Object.assign(e.style, v);
+      else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2), v);
+      else e.setAttribute(k, v);
     }
+    for (const n of [].concat(c)) e.append(n?.nodeType ? n : document.createTextNode(n ?? ''));
+    return e;
+  };
 
-    /* sections + items preserved */
-    const SECTIONS=[
-      {
-        title:'Insurance claims',
-        defaultExpanded:true,
-        items:[
-          { title:'Drafts' },
-          // { title:'Unsubmitted (28)' },
-          { title:'Submitted (416)' },
-          { title:'Approved' },
-          { title:'On Hold' },
-          { title:'Rejected (203)' },
-          // { title:'Partially Paid' },
-          // { title:'Teleplan Submissions', indent:2 },
-          // { title:'Teleplan Remittances', indent:2 },
-          // { title:'Canada Life (TELUS eClaims)', indent:2 },
-          // { title:'HCAI', indent:2 },
-          // { title:'Manulife', indent:2 },
-          // { title:'MSP (British Columbia)', indent:2 },
-          // { title:'Pacific Blue Cross (Paper)', indent:2 },
-          // { title:'Pacific Blue Cross PROVIDERnet', indent:2 },
-          // { title:'WCB', indent:2 },
-          // { title:'WSBC', indent:2 },
-        ]
-      },
-      {
-        title:'Payments',
-        items:[
-          { title:'Transactions' },
-          { title:'Refunds' },
-          { title:'Cash Reconciliation' },
-          { title:'Reconciliation' },
-          // { title:'Jane Payments Monthly Processing' },
-          { title:'Payouts' },
-          // { title:'Tips' },
-          { title:'Adjustments' },
-          // { title:'Write Offs' },
-        ]
-      },
-      {
-        title:'Sales & Products',
-        items:[
-          // { title:'New Sale' },
-          { title:'Purchases' },
-          { title:'Gift Cards' },
-          { title:'Packages' },
-          { title:'Memberships' },
-        ]
-      },
-      {
-        title:'Reports',
-        items:[
-          { title:'Summary' },
-          { title:'Total Sales' },
-          { title:'Performance' },
-          { title:'Accounts Receivable' },
-          { title:'Credit' },
-          // { title:'Credit Memos' },
-          { title:'Gift Cards' },
-          // { title:'Gift Card Transactions' },
-          // { title:'Package & Membership Sales' },
-          { title:'Packages & Memberships' },
-          { title:'Compensation' },
-          { title:'Transactions' },
-          // { title:'Daily Transactions' },
-          { title:'Insurance' },
-          { title:'Inventory' },
-        ]
-      }
-    ];
+  const Chevron = () => h('span', { class: 'chev' }, ['›']);
 
-    const app=document.getElementById('app');
-    SECTIONS.forEach(cfg=>app.append(createSection(cfg)));
-  </script>
+  // ---- strict accordion helpers ----
+  function openSection(sectionEl) {
+    document.querySelectorAll('#app .section').forEach(sec => {
+      const hdr = sec.querySelector('.section__header');
+      const list = sec.querySelector('.section__items');
+      const chev = sec.querySelector('.chev');
+      const isTarget = sec === sectionEl;
+      hdr.setAttribute('aria-expanded', String(isTarget));
+      list.style.display = isTarget ? 'block' : 'none';
+      chev.classList.toggle('chev--open', isTarget);
+    });
+  }
+
+  function createSection({ title, items = [], defaultExpanded = false }) {
+    const root = h('div', { class: 'section' });
+    const chev = Chevron();
+
+    const header = h('button', {
+      class: 'section__header',
+      type: 'button',
+      'aria-expanded': 'false'
+    }, [title, chev]);
+
+    const list = h('div', { class: 'section__items', style: { display: 'none' } });
+
+    items.forEach(it => {
+      const indent = `indent-${Math.min(Math.max(it.indent ?? 1, 1), 3)}`;
+      list.append(h('button', { class: `item ${indent}`, type: 'button' }, [it.title]));
+    });
+
+    // Click: strict accordion — never collapse the currently open one via click
+    header.addEventListener('click', () => {
+      const isOpen = header.getAttribute('aria-expanded') === 'true';
+      if (isOpen) return;             // do nothing if already open
+      openSection(root);               // switch to this section
+    });
+
+    // store flag so we know which one to open initially
+    if (defaultExpanded) root.dataset.default = 'true';
+
+    root.append(header, list);
+    return root;
+  }
+
+  /* your data (unchanged) */
+  const SECTIONS = [
+    {
+      title: 'Insurance claims',
+      defaultExpanded: true,
+      items: [
+        { title: 'Drafts' },
+        { title: 'Submitted (416)' },
+        { title: 'Approved' },
+        { title: 'On Hold' },
+        { title: 'Rejected (203)' },
+      ]
+    },
+    {
+      title: 'Payments',
+      items: [
+        { title: 'Transactions' },
+        { title: 'Refunds' },
+        { title: 'Cash Reconciliation' },
+        { title: 'Reconciliation' },
+        { title: 'Payouts' },
+        { title: 'Adjustments' },
+      ]
+    },
+    {
+      title: 'Sales & Products',
+      items: [
+        { title: 'Purchases' },
+        { title: 'Gift Cards' },
+        { title: 'Packages' },
+        { title: 'Memberships' },
+      ]
+    },
+    {
+      title: 'Reports',
+      items: [
+        { title: 'Summary' },
+        { title: 'Total Sales' },
+        { title: 'Performance' },
+        { title: 'Accounts Receivable' },
+        { title: 'Credit' },
+        { title: 'Packages & Memberships' },
+        { title: 'Compensation' },
+        { title: 'Transactions' },
+        { title: 'Insurance' },
+        { title: 'Inventory' },
+      ]
+    }
+  ];
+
+  // render
+  const app = document.getElementById('app');
+  const sectionEls = SECTIONS.map(cfg => {
+    const el = createSection(cfg);
+    app.append(el);
+    return el;
+  });
+
+  // ensure exactly one open on load
+  const firstDefault = sectionEls.find(el => el.dataset.default === 'true') || sectionEls[0];
+  openSection(firstDefault);
+</script>
+
 </body>
 </html>
