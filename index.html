@@ -144,6 +144,21 @@
     .indent-1{ padding-left:22px; }
     .indent-2{ padding-left:38px; }
     .indent-3{ padding-left:54px; }
+
+  .badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:#e11d48;   /* red */
+  color:#fff;
+  font-size:12px;
+  font-weight:600;
+  border-radius:999px;
+  padding:2px 8px;
+  margin-left:8px;
+  line-height:1;
+}
+  
   </style>
 </head>
 <body>
@@ -201,50 +216,62 @@
     });
   }
 
-  function createSection({ title, items = [], defaultExpanded = false }) {
-    const root = h('div', { class: 'section' });
-    const chev = Chevron();
+  function createSection({ title, items = [], defaultExpanded = false, badge = null }) {
+  const root = h('div', { class: 'section' });
+  const chev = Chevron();
 
-    const header = h('button', {
-      class: 'section__header',
-      type: 'button',
-      'aria-expanded': 'false'
-    }, [title, chev]);
-
-    const list = h('div', { class: 'section__items', style: { display: 'none' } });
-
-    items.forEach(it => {
-      const indent = `indent-${Math.min(Math.max(it.indent ?? 1, 1), 3)}`;
-      list.append(h('button', { class: `item ${indent}`, type: 'button' }, [it.title]));
-    });
-
-    // Click: strict accordion — never collapse the currently open one via click
-    header.addEventListener('click', () => {
-      const isOpen = header.getAttribute('aria-expanded') === 'true';
-      if (isOpen) return;             // do nothing if already open
-      openSection(root);               // switch to this section
-    });
-
-    // store flag so we know which one to open initially
-    if (defaultExpanded) root.dataset.default = 'true';
-
-    root.append(header, list);
-    return root;
+  // Title container with optional badge
+  const titleEl = h('span', {}, [title]);
+  const headerChildren = [titleEl];
+  if (badge !== null) {
+    headerChildren.push(h('span', { class: 'badge' }, [String(badge)]));
   }
+  headerChildren.push(chev);
+
+  const header = h('button', {
+    class: 'section__header',
+    type: 'button',
+    'aria-expanded': String(defaultExpanded)
+  }, headerChildren);
+
+  const list = h('div', {
+    class: 'section__items',
+    style: { display: defaultExpanded ? 'block' : 'none' }
+  });
+
+  if (defaultExpanded) chev.classList.add('chev--open');
+
+  items.forEach(it => {
+    const indent = `indent-${Math.min(Math.max(it.indent ?? 1, 1), 3)}`;
+    list.append(h('button', { class: `item ${indent}`, type: 'button' }, [it.title]));
+  });
+
+  header.addEventListener('click', () => {
+    const isOpen = header.getAttribute('aria-expanded') === 'true';
+    if (isOpen) return; // strict accordion: don’t collapse self
+    openSection(root);
+  });
+
+  if (defaultExpanded) root.dataset.default = 'true';
+  root.append(header, list);
+  return root;
+}
+
 
   /* your data (unchanged) */
   const SECTIONS = [
     {
-      title: 'Insurance claims',
-      defaultExpanded: true,
-      items: [
-        { title: 'Drafts' },
-        { title: 'Submitted (416)' },
-        { title: 'Approved' },
-        { title: 'On Hold' },
-        { title: 'Rejected (203)' },
-      ]
-    },
+    title: 'Insurance claims',
+    defaultExpanded: true,
+    badge: 15,
+    items: [
+      { title: 'Drafts' },
+      { title: 'Submitted (416)' },
+      { title: 'Approved' },
+      { title: 'On Hold' },
+      { title: 'Rejected (203)' },
+    ]
+  },
     {
       title: 'Payments',
       items: [
